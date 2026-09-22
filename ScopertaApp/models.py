@@ -1,4 +1,4 @@
-from database import Base
+from .database import Base
 from sqlalchemy import Column, Integer, String, Boolean
 
 
@@ -25,6 +25,7 @@ class Scoperta(Base):
     __tablename__ = "scoperta"
 
     id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, nullable=False, index=True)
     title = Column(String)
     description = Column(String)
     priority = Column(Integer)

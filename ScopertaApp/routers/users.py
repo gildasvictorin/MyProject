@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from starlette import status
+
+from .auth import get_current_user
 from ..models import Scoperta, Users
 from ..database import SessionLocal
 from passlib.context import CryptContext

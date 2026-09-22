@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-import models
-from ScopertaApp.routers import scoperta
-from database import engine
+from . import models
+from ScopertaApp.routers import scoperta, auth, users, admin
+from .database import engine
 
 app = FastAPI()
 
@@ -18,3 +18,6 @@ def health_check():
 
 
 app.include_router(scoperta.router)
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(admin.router)

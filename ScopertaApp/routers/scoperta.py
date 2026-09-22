@@ -76,7 +76,7 @@ async def render_scoperta_page(request: Request, db: db_dependency):
 
 
 @router.get("/add-scoperta-page")
-async def render_todo_page(request: Request):
+async def render_scoperta_page(request: Request):
     try:
         user = await get_current_user(request.cookies.get("access_token"))
 
@@ -95,19 +95,19 @@ async def render_todo_page(request: Request):
 
 
 @router.get("/edit-scoperta-page/{scoperta_id}")
-async def render_edit_todo_page(request: Request, todo_id, db: db_dependency):
+async def render_edit_scoperta_page(request: Request, scoperta_id, db: db_dependency):
     try:
         user = await get_current_user(request.cookies.get("access_token"))
 
         if user is None:
             return redirect_to_login()
 
-        todo = db.query(Scoperta).filter(Scoperta.id == todo_id).first()
+        scoperta = db.query(Scoperta).filter(Scoperta.id == scoperta_id).first()
 
         return templates.TemplateResponse(
             request=request,
             name="edit-scoperta.html",
-            context={"request": request, "scoperta": scoperta, "user": user})
+            context={"request": request, "scoperta": Scoperta, "user": user})
 
     except:
         return redirect_to_login()
@@ -129,68 +129,68 @@ async def read_all(user: user_dependency, db:db_dependency):
 
 #Get ALL ID FROM REQUEST ID AND USERS ID REQUUEST
 
-@router.get("/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def read_todo(user: user_dependency, db: db_dependency, todo_id: int= Path(gt=0)):
+@router.get("/scoperta/{scoperta_id}", status_code=status.HTTP_200_OK)
+async def read_scoperta(user: user_dependency, db: db_dependency, scoperta_id: int= Path(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed")
 
-    todo_model = db.query(Scoperta).filter(Scoperta.id == todo_id)\
+    scoperta_model = db.query(Scoperta).filter(Scoperta.id == scoperta_id)\
         .filter(Scoperta.owner_id == user.get("id")).first()
-    if todo_model is not None:
-        return todo_model
-    raise HTTPException(status_code=404, detail="todo not found")
+    if scoperta_model is not None:
+        return scoperta_model
+    raise HTTPException(status_code=404, detail="scoperta not found")
 
 #CREATE A POST REQUEST
 #ADD NEW CLASS TodoRequest and import from pydantic BaseModel and Field and connect with user
 
-@router.post("/todo", status_code=status.HTTP_201_CREATED)
-async def create_todo(user: user_dependency, db: db_dependency,
-                      todo_request: ScopertaRequest):
+@router.post("/scoperta", status_code=status.HTTP_201_CREATED)
+async def create_scoperta(user: user_dependency, db: db_dependency,
+                      scoperta_request: ScopertaRequest):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed")
-    todo_model = Scoperta(**todo_request.model_dump(), owner_id=user.get("id"))
+    scoperta_model = Scoperta(**scoperta_request.model_dump(), owner_id=user.get("id"))
 
-    db.add(todo_model)
+    db.add(scoperta_model)
     db.commit()
 
 
 
 #PUT OR UPDATE ENDPOINT
 
-@router.put("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_todo(user: user_dependency, db: db_dependency,
-                      todo_request: ScopertaRequest,
-                      todo_id: int = Path(gt=0)):
+@router.put("/scoperta/{scoperta_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_scoperta(user: user_dependency, db: db_dependency,
+                      scoperta_request: ScopertaRequest,
+                      scoperta_id: int = Path(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed")
 
-    todo_model = db.query(Scoperta).filter(Scoperta.id == todo_id)\
+    scoperta_model = db.query(Scoperta).filter(Scoperta.id == scoperta_id)\
         .filter(Scoperta.owner_id == user.get("id")).first()
-    if todo_model is None:
-        raise HTTPException(status_code=404, detail="todo not found")
+    if scoperta_model is None:
+        raise HTTPException(status_code=404, detail="scoperta not found")
 
-    todo_model.title = todo_request.title
-    todo_model.description = todo_request.description
-    todo_model.priority = todo_request.priority
-    todo_model.complete = todo_request.complete
+    scoperta_model.title = scoperta_request.title
+    scoperta_model.description = scoperta_request.description
+    scoperta_model.priority = scoperta_request.priority
+    scoperta_model.complete = scoperta_request.complete
 
 
-    db.add(todo_model)
+    db.add(scoperta_model)
     db.commit()
 
 
 #DELETE ENDPOINT
 
-@router.delete("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
+@router.delete("/scoperta/{scoperta_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_scoperta(user: user_dependency, db: db_dependency, scoperta_id: int = Path(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication failed")
 
-    todo_model = db.query(Scoperta).filter(Scoperta.id == todo_id)\
+    scoperta_model = db.query(Scoperta).filter(Scoperta.id == scoperta_id)\
         .filter(Scoperta.owner_id == user.get("id")).first()
-    if todo_model is None:
-        raise HTTPException(status_code=404, detail="todo not found")
-    db.query(Scoperta).filter(Scoperta.id == todo_id)\
+    if scoperta_model is None:
+        raise HTTPException(status_code=404, detail="scoperta not found")
+    db.query(Scoperta).filter(Scoperta.id == scoperta_id)\
         .filter(Scoperta.owner_id == user.get("id")).delete()
 
     db.commit()
