@@ -33,3 +33,14 @@ async def read_all(user: user_dependency, db: db_dependency):
     if user is None or user.get("user_role") != "admin":
         raise HTTPException(status_code=401, detail="Authentication failed")
     return db.query(Scoperta).all()
+
+
+@router.delete("/scoperta/{scoperta_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_scoperta(user: user_dependency, db: db_dependency, scoperta_id: int = Path(gt=0)):
+    if user is None or user.get("user_role") != "admin":
+        raise HTTPException(status_code=401, detail="Authentication failed")
+    scoperta_model = db.query(Scoperta).filter(Scoperta.id == scoperta_id).first()
+    if scoperta_model is None:
+        raise HTTPException(status_code=404, detail="scoperta not found")
+    db.query(Scoperta).filter(Scoperta.id == scoperta_id).delete()
+    db.commit()

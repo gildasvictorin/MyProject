@@ -107,7 +107,7 @@ async def render_edit_scoperta_page(request: Request, scoperta_id, db: db_depend
         return templates.TemplateResponse(
             request=request,
             name="edit-scoperta.html",
-            context={"request": request, "scoperta": Scoperta, "user": user})
+            context={"request": request, "scoperta": scoperta, "user": user})
 
     except:
         return redirect_to_login()
