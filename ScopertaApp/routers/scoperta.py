@@ -10,11 +10,11 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 
-templates = Jinja2Templates(directory="TodoApp/templates")
+templates = Jinja2Templates(directory="ScopertaApp/templates")
 
 
 router = APIRouter(
-    prefix="/Scoperta",
+    prefix="/scoperta",
     tags=["scoperta"]
 )
 
@@ -62,12 +62,12 @@ async def render_scoperta_page(request: Request, db: db_dependency):
         if user is None:
             return redirect_to_login()
 
-        todos = db.query(Scoperta).filter(Scoperta.owner_id == user.get("id")).all()
+        scoperta = db.query(Scoperta).filter(Scoperta.owner_id == user.get("id")).all()
 
         return templates.TemplateResponse(
             request=request,
-            name="todo.html",
-            context={"request": request, "todos": todos, "user": user}
+            name="scoperta.html",
+            context={"request": request, "scoperta": scoperta, "user": user}
         )
 
     except:
