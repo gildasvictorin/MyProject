@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% include "layout.html" %}
 
-</body>
-</html>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Make a new scoperta
+        </div>
+        <div class="card-body">
+            <form id="scopertaForm">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" class="form-control" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" rows="3" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select class="form-control" name="priority">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Add new scoperta</button>
+                <a href="/scoperta/scoperta-page" class="btn btn-success">Back</a>
+            </form>
+        </div>
+    </div>
+</div>

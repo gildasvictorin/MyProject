@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from . import models
 from ScopertaApp.routers import scoperta, auth, users, admin
 from .database import engine
-from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 
 
 
@@ -18,17 +18,13 @@ models.Base.metadata.create_all(bind=engine)
 app.mount("/static", StaticFiles(directory="ScopertaApp/static"), name="static")
 
 
-templates=Jinja2Templates(directory="ScopertaApp/templates")
+
 
 
 
 @app.get("/")
 def test(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="home.html",
-        context={"request": request}
-    )
+    return RedirectResponse(url="/scoperta/scoperta-page", status_code=status.HTTP_302_FOUND)
 
 
 @app.get("/healthy")

@@ -95,14 +95,15 @@ async def render_scoperta_page(request: Request):
 
 
 @router.get("/edit-scoperta-page/{scoperta_id}")
-async def render_edit_scoperta_page(request: Request, scoperta_id, db: db_dependency):
+async def render_edit_scoperta_page(request: Request, scoperta_id: int, db: db_dependency):
     try:
         user = await get_current_user(request.cookies.get("access_token"))
-
-        if user is None:
-            return redirect_to_login()
-
-        scoperta = db.query(Scoperta).filter(Scoperta.id == scoperta_id).first()
+        scoperta = db.query(Scoperta).filter(
+            Scoperta.id == scoperta_id,
+            Scoperta.owner_id == user.get("id")
+        ).first()
+        if scoperta is None:
+            return RedirectResponse(url="/scoperta/scoperta-page", status_code=status.HTTP_303_SEE_OTHER)
 
         return templates.TemplateResponse(
             request=request,

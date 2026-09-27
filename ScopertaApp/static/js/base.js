@@ -59,12 +59,9 @@
 
         try {
             const token = getCookie('access_token');
-            console.log(token)
             if (!token) {
                 throw new Error('Authentication token not found');
             }
-
-            console.log(`${todoId}`)
 
             const response = await fetch(`/scoperta/scoperta/${scopertaId}`, {
                 method: 'PUT',
@@ -146,13 +143,11 @@
                 });
 
                 if (response.ok) {
-                    // Handle success (e.g., redirect to dashboard)
                     const data = await response.json();
-                    // Delete any cookies available
-                    logout();
-                    // Save token to cookie
-                    document.cookie = `access_token=${data.access_token}; path=/`;
-                    window.location.href = '/scoperta/scoperta-page'; // Change this to your desired redirect page
+                    document.cookie = `access_token=${encodeURIComponent(data.access_token)}; path=/; max-age=3600; SameSite=Lax`;
+                    setTimeout(() => {
+                        window.location.assign('/scoperta/scoperta-page');
+                    }, 100);
                 } else {
                     // Handle error
                     const errorData = await response.json();
