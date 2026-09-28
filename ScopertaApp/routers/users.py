@@ -1,12 +1,21 @@
+import sys
+
+from starlette.templating import Jinja2Templates
+
+from .. import models
+
+sys.path.append("..")
+from starlette.responses import RedirectResponse
+from pathlib import Path
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Form, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from starlette import status
-
 from .auth import get_current_user
+from fastapi.responses import HTMLResponse
 from ..models import Scoperta, Users
-from ..database import SessionLocal
+from ..database import SessionLocal, engine
 from passlib.context import CryptContext
 
 
@@ -17,10 +26,15 @@ from passlib.context import CryptContext
 
 router = APIRouter(
     prefix="/user",
-    tags=["user"]
+    tags=["user"],
+    responses={404: {"description": "Not Found"}}
 )
 
 
+models.Base.metadata.create_all(bind=engine)
+templates = Jinja2Templates(
+    directory=str(Path(__file__).resolve().parent.parent / "templates")
+)
 
 
 def get_db():
@@ -38,10 +52,64 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserVerification(BaseModel):
+    username: str
     password: str
     new_password: str = Field(min_length=6)
 
 
+###PAGES TO EDIT USER PASSWORD###
+
+@router.get("/edit-password", response_class=HTMLResponse)
+async def edit_user_view(request: Request):
+    user = await get_current_user(request.cookies.get("access_token"))
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit-user-password.html",
+        context={"request": request, "user": user}
+    )
+
+
+
+##display correct message when to edit the password
+
+
+@router.post("/edit-password", response_class=HTMLResponse)
+async def user_password_change(request: Request, username: str = Form(...),
+                               password: str = Form(...), password2: str = Form(...),
+                               db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+    try:
+        user = await get_current_user(token)
+    except HTTPException:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    user_data = db.query(models.Users).filter(models.Users.id == user.get("id")).first()
+
+    msg = "Invalid username or password"
+
+    if user_data is not None:
+        if username == user_data.username and bcrypt_context.verify(password, user_data.hashed_password):
+            user_data.hashed_password = bcrypt_context.hash(password2)
+            db.add(user_data)
+            db.commit()
+            msg = 'Password updated'
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit-user-password.html",
+        context={"request": request, "user": user, "msg": msg}
+    )
+
+
+
+###ENDPOINT FOR MY BACKEND###
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
