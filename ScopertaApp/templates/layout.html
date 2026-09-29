@@ -10,8 +10,12 @@
 <body>
     {% include 'navbar.html' %}
 
-    {% block content %}
-    {% endblock %}
+    <main class="page-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'partials/_footer.html' %}
 
     <script src="{{ url_for('static', path='/js/jquery-slim.js') }}"></script>
     <script src="{{ url_for('static', path='/js/popper.js') }}"></script>
