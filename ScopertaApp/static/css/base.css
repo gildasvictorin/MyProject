@@ -9,7 +9,11 @@ body {
 }
 
 .page-content {
-  flex: 1;
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -27,6 +31,5 @@ h1, h2, h3, h4, h5, h6 {
 /* h1 {
   color: red;
 } */
-
 
 

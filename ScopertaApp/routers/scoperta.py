@@ -114,8 +114,13 @@ async def render_edit_scoperta_page(request: Request, scoperta_id: int, db: db_d
         return redirect_to_login()
 
 
-
-
+@router.get("/terms")
+async def render_terms_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="terms.html",
+        context={"request": request},
+    )
 
 
 

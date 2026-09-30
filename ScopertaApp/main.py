@@ -9,7 +9,7 @@ from fastapi.responses import RedirectResponse
 
 
 
-app = FastAPI()
+app = FastAPI(title="Scoperta App")
 
 
 models.Base.metadata.create_all(bind=engine)
