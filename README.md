@@ -3,3 +3,4 @@ For my backend with Fastapi I create users, admin, authentication and authorizat
 I use Jinja2 for my front end 
 Users can edit their tables, change their password and delete scoperta Table
 so the application is FULL STACK
+
